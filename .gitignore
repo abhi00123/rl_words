@@ -1,0 +1,20 @@
+# Development
+node_modules/
+.env
+
+# Generated Files
+words_raw.txt
+_generate.ps1
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS metadata
+.DS_Store
+Thumbs.db
