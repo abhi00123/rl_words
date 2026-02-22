@@ -3,6 +3,7 @@
 
   // ── DOM refs ──────────────────────────────────────────────
   const searchInput = document.getElementById('searchInput');
+  const clearBtn = document.getElementById('clearBtn');
   const resetBtn = document.getElementById('resetBtn');
   const wordListEl = document.getElementById('wordList');
   const totalCountEl = document.getElementById('totalCount');
@@ -89,8 +90,8 @@
         const w = words[idx];
         const div = document.createElement('div');
         div.className = 'word-item';
-        // Highlight prefix
-        div.innerHTML = `<strong>${w.slice(0, prefix.length)}</strong>${w.slice(prefix.length)}`;
+        // Highlight remaining letters instead of the prefix, wrap in span for flexbox
+        div.innerHTML = `<span>${w.slice(0, prefix.length)}<strong>${w.slice(prefix.length)}</strong></span>`;
         div.dataset.word = w;
         frag.appendChild(div);
       }
@@ -155,6 +156,14 @@
         wordListEl.innerHTML = '<div class="no-results"><div class="icon-empty"></div><p>No words found</p></div>';
       }
     }, { once: true });
+  });
+
+  // ── Event: clear ──────────────────────────────────────────
+  clearBtn.addEventListener('click', () => {
+    searchInput.value = '';
+    wordListEl.innerHTML = '<div class="placeholder-msg"><div class="icon-search"></div><p>Start typing to see results</p></div>';
+    totalCountEl.textContent = 'Total: 0';
+    searchInput.focus();
   });
 
   // ── Event: reset ──────────────────────────────────────────

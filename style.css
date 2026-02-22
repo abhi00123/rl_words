@@ -130,6 +130,12 @@ h1 {
   box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
 }
 
+.button-group {
+  display: flex;
+  gap: 8px;
+}
+
+#clearBtn,
 #resetBtn {
   padding: 0 20px;
   font-size: 1.05rem;
@@ -143,6 +149,8 @@ h1 {
   transition: var(--transition);
 }
 
+#clearBtn:hover,
+#clearBtn:active,
 #resetBtn:hover,
 #resetBtn:active {
   background: rgba(255, 255, 255, 0.1);
@@ -211,11 +219,14 @@ h1 {
   color: #94a3b8;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  position: relative;
 }
 
 .word-item::after {
   content: '+';
+  position: absolute;
+  right: 20px;
   font-size: 1.5rem;
   opacity: 0;
   transform: translateX(-10px);
@@ -317,8 +328,15 @@ h1 {
     flex-direction: column;
   }
 
+  .button-group {
+    display: flex;
+    gap: 8px;
+  }
+
+  #clearBtn,
   #resetBtn {
     padding: 14px;
+    flex: 1;
   }
 
   #searchInput {
