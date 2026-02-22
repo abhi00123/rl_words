@@ -24,16 +24,5 @@ Since this is a fully Vanilla application with pre-complied word lists, there ar
 2. Open the `index.html` file directly in any modern web browser.
 *That's it!*
 
-### (Optional) Dictionary Regeneration
-If you want to re-run the script that fetches the dictionary, generates all 4-letter combos, and merges them:
-
-1. Open PowerShell.
-2. Navigate to the project folder.
-3. Run the generator script:
-   ```ps1
-   powershell -ExecutionPolicy Bypass -File .\_generate.ps1
-   ```
-   *(Note: This might take a few moments to download and process nearly a million words!)*
-
 ---
 Designed with aesthetics and real-time JavaScript performance in mind.
