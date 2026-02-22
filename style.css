@@ -42,6 +42,7 @@ body {
     linear-gradient(135deg, var(--bg-gradient-1), var(--bg-gradient-2));
   z-index: -1;
   animation: bgPulse 15s ease-in-out infinite alternate;
+  will-change: transform;
 }
 
 @keyframes bgPulse {
@@ -184,6 +185,8 @@ h1 {
   position: relative;
   /* Smooth scroll for iOS */
   -webkit-overflow-scrolling: touch;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .word-list::-webkit-scrollbar {
@@ -320,5 +323,19 @@ h1 {
 
   #searchInput {
     padding: 14px 16px;
+  }
+}
+
+/* Extra mobile performance optimizations */
+@media (max-width: 768px) {
+  .app-bg {
+    animation: none;
+    /* Disable expensive background animation on mobile */
+  }
+
+  .glass-card {
+    backdrop-filter: blur(12px);
+    /* Reduce blur computation on mobile */
+    -webkit-backdrop-filter: blur(12px);
   }
 }

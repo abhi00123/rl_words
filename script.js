@@ -68,15 +68,23 @@
       return;
     }
 
-    totalCountEl.textContent = `Total: ${words.length}`;
+    const MAX_DISPLAY = 200;
+    const isTruncated = words.length > MAX_DISPLAY;
+
+    if (isTruncated) {
+      totalCountEl.textContent = `Total: ${words.length} (Showing top ${MAX_DISPLAY})`;
+    } else {
+      totalCountEl.textContent = `Total: ${words.length}`;
+    }
 
     // Render in batches to avoid blocking the main thread on large result sets
-    const BATCH = 200;
+    const BATCH = 50;
     let idx = 0;
+    const limit = Math.min(words.length, MAX_DISPLAY);
 
     function renderBatch() {
       const frag = document.createDocumentFragment();
-      const end = Math.min(idx + BATCH, words.length);
+      const end = Math.min(idx + BATCH, limit);
       for (; idx < end; idx++) {
         const w = words[idx];
         const div = document.createElement('div');
@@ -88,8 +96,17 @@
       }
       wordListEl.appendChild(frag);
 
-      if (idx < words.length) {
+      if (idx < limit) {
         requestAnimationFrame(renderBatch);
+      } else if (isTruncated) {
+        const msg = document.createElement('div');
+        msg.className = 'word-item';
+        msg.style.justifyContent = 'center';
+        msg.style.color = '#94a3b8';
+        msg.style.fontSize = '0.9rem';
+        msg.style.pointerEvents = 'none';
+        msg.innerHTML = `<em>Type more letters to see remaining words...</em>`;
+        wordListEl.appendChild(msg);
       }
     }
 

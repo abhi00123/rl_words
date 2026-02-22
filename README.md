@@ -1,10 +1,10 @@
 # Universal Prefix-Based Word Generator
 
-A lightning-fast, premium web application that allows users to instantly search for and select words based on any typed prefix. Featuring a massive underlying dictionary of exactly **835,713** deduplicated words, beautiful glassmorphism aesthetics, and real-time performance.
+A lightning-fast, premium web application that allows users to instantly search for and select words based on any typed prefix. Featuring a massive underlying dictionary of exactly **386,584** deduplicated words, beautiful glassmorphism aesthetics, and real-time performance.
 
 ## Features
 
-- ⚡ **Instant Search via Binary Search Tree Logic**: A custom `lowerBound` function instantly filters thousands of matches from the 835K word dataset without lagging the main browser thread.
+- ⚡ **Instant Search via Binary Search Tree Logic**: A custom `lowerBound` function instantly filters thousands of matches from the 386K word dataset without lagging the main browser thread.
 - 🎨 **Premium Glassmorphism UI**: A fluid dark-theme gradient background is paired with a beautiful semi-transparent glass aesthetic interface. Micro-animations respond to interactions on both desktop and mobile devices.
 - 📱 **Mobile & Touch Optimized**: Thoughtfully scaled padding, native-app viewport locking (disabling zoom tap), and frictionless touch scroll ensure perfect usability on any screen size.
 - 💾 **Persistent Selections**: Words selected by the user are saved automatically via `localStorage` and persist even after browser refreshes.
