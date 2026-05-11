@@ -2,17 +2,20 @@
   'use strict';
 
   // ── DOM refs ──────────────────────────────────────────────
-  const searchInput = document.getElementById('searchInput');
-  const clearBtn = document.getElementById('clearBtn');
-  const resetBtn = document.getElementById('resetBtn');
-  const wordListEl = document.getElementById('wordList');
-  const totalCountEl = document.getElementById('totalCount');
+  const searchInput    = document.getElementById('searchInput');
+  const clearBtn        = document.getElementById('clearBtn');
+  const resetBtn        = document.getElementById('resetBtn');
+  const containsBtn     = document.getElementById('containsBtn');
+  const modeBadge       = document.getElementById('modeBadge');
+  const wordListEl      = document.getElementById('wordList');
+  const totalCountEl    = document.getElementById('totalCount');
   const selectedCountEl = document.getElementById('selectedCount');
 
   // ── State ─────────────────────────────────────────────────
   const STORAGE_KEY = 'selectedWords';
-  let selectedWords = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'));
-  let debounceTimer = null;
+  let selectedWords  = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'));
+  let debounceTimer  = null;
+  let containsMode   = false;   // false = prefix, true = contains
 
   // ── Use pre-sorted, deduplicated WORDS array ────────
   // The WORDS array comes from words.js
@@ -35,17 +38,30 @@
   }
 
   /**
-   * Return all words starting with `prefix`, excluding selected words.
-   * Uses binary search + linear scan for speed on sorted array.
+   * Return words matching the current mode.
+   * Prefix mode : binary search for speed on the sorted array.
+   * Contains mode: linear scan (necessary for arbitrary substring).
    */
-  function filterWords(prefix) {
-    if (!prefix) return [];
+  function filterWords(query) {
+    if (!query) return [];
     const results = [];
-    const start = lowerBound(prefix);
-    for (let i = start; i < ALL_WORDS.length; i++) {
-      const w = ALL_WORDS[i];
-      if (!w.startsWith(prefix)) break;     // past the prefix range
-      if (!selectedWords.has(w)) results.push(w);
+
+    if (!containsMode) {
+      // ── Prefix search (fast binary search) ────────────────
+      const start = lowerBound(query);
+      for (let i = start; i < ALL_WORDS.length; i++) {
+        const w = ALL_WORDS[i];
+        if (!w.startsWith(query)) break;
+        if (!selectedWords.has(w)) results.push(w);
+      }
+    } else {
+      // ── Contains search (linear scan) ─────────────────────
+      for (let i = 0; i < ALL_WORDS.length; i++) {
+        const w = ALL_WORDS[i];
+        // must contain query but NOT start with it (to avoid duplicating prefix results)
+        // Actually show ALL words containing query (including prefix ones)
+        if (w.includes(query) && !selectedWords.has(w)) results.push(w);
+      }
     }
     return results;
   }
@@ -87,12 +103,23 @@
       const frag = document.createDocumentFragment();
       const end = Math.min(idx + BATCH, limit);
       for (; idx < end; idx++) {
-        const w = words[idx];
+        const w   = words[idx];
         const div = document.createElement('div');
-        div.className = 'word-item';
-        // Highlight remaining letters instead of the prefix, wrap in span for flexbox
-        div.innerHTML = `<span>${w.slice(0, prefix.length)}<strong>${w.slice(prefix.length)}</strong></span>`;
+        div.className  = 'word-item';
         div.dataset.word = w;
+
+        if (!containsMode) {
+          // Highlight the trailing part after the prefix
+          div.innerHTML = `<span>${w.slice(0, prefix.length)}<strong>${w.slice(prefix.length)}</strong></span>`;
+        } else {
+          // Highlight every occurrence of the query inside the word
+          const idx2   = w.indexOf(prefix);
+          const before = w.slice(0, idx2);
+          const match  = w.slice(idx2, idx2 + prefix.length);
+          const after  = w.slice(idx2 + prefix.length);
+          div.innerHTML = `<span>${before}<strong class="contains-match">${match}</strong>${after}</span>`;
+        }
+
         frag.appendChild(div);
       }
       wordListEl.appendChild(frag);
@@ -126,13 +153,29 @@
   // ── Event: input with debounce ────────────────────────────
   searchInput.addEventListener('input', () => {
     clearTimeout(debounceTimer);
+    // Contains mode can be slow on large datasets — use longer debounce
+    const delay = containsMode ? 400 : 300;
     debounceTimer = setTimeout(() => {
-      // Allow only a-z
       const raw = searchInput.value.replace(/[^a-zA-Z]/g, '').toLowerCase();
       searchInput.value = raw;
       const results = filterWords(raw);
       render(results, raw);
-    }, 300);
+    }, delay);
+  });
+
+  // ── Event: contains toggle ────────────────────────────────
+  containsBtn.addEventListener('click', () => {
+    containsMode = !containsMode;
+    containsBtn.classList.toggle('active', containsMode);
+    modeBadge.innerHTML = containsMode
+      ? 'Mode: <strong class="mode-contains">Contains</strong>'
+      : 'Mode: <strong>Starts With</strong>';
+    // Re-run search with new mode
+    const raw = searchInput.value.replace(/[^a-zA-Z]/g, '').toLowerCase();
+    if (raw) {
+      const results = filterWords(raw);
+      render(results, raw);
+    }
   });
 
   // ── Event: click on a word (delegated) ────────────────────
